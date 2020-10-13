@@ -6,7 +6,11 @@
  * that can be found in the LICENSE file at http://www.apache.org/licenses/LICENSE-2.0
  */
 /// <reference path="../../index.d.ts" />
+/// <reference path="../Component.d.ts" />
+/// <reference path="../Component.ts" />
 /// <reference path="./address/index.ts" />
+/// <reference path="./businesspartnergroup/index.ts" />
+/// <reference path="./contactperson/index.ts" />
 /// <reference path="./customer/index.ts" />
 /// <reference path="./supplier/index.ts" />
 namespace businesspartner {
@@ -30,6 +34,12 @@ namespace businesspartner {
                         break;
                     case app.SupplierChooseApp.APPLICATION_ID:
                         view = new m.SupplierChooseView();
+                        break;
+                    case app.BusinessPartnerGroupChooseApp.APPLICATION_ID:
+                        view = new m.BusinessPartnerGroupChooseView();
+                        break;
+                    case app.ContactPersonChooseApp.APPLICATION_ID:
+                        view = new m.ContactPersonChooseView();
                         break;
                     default:
                         break;

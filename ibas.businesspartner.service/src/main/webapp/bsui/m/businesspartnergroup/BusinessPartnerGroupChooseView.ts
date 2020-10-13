@@ -8,10 +8,10 @@
 namespace businesspartner {
     export namespace ui {
         export namespace m {
-            export class SupplierChooseView extends ibas.BOChooseView implements app.ISupplierChooseView {
+            export class BusinessPartnerGroupChooseView extends ibas.BOChooseView implements app.IBusinessPartnerGroupChooseView {
                 /** 返回查询的对象 */
                 get queryTarget(): any {
-                    return bo.Supplier;
+                    return bo.BusinessPartnerGroup;
                 }
                 /** 绘制视图 */
                 draw(): any {
@@ -26,27 +26,13 @@ namespace businesspartner {
                                 title: "{name} ({code})",
                                 attributes: [
                                     new sap.extension.m.RepositoryObjectAttribute("", {
-                                        title: ibas.i18n.prop("bo_supplier_group"),
-                                        text: "{group}",
+                                        title: ibas.i18n.prop("bo_businesspartnergroup_parents"),
+                                        text: "{parents}",
                                         repository: bo.BORepositoryBusinessPartner,
                                         dataInfo: {
                                             type: bo.BusinessPartnerGroup,
                                             key: bo.BusinessPartnerGroup.PROPERTY_CODE_NAME,
                                             text: bo.BusinessPartnerGroup.PROPERTY_NAME_NAME
-                                        },
-                                    }),
-                                    new sap.m.ObjectAttribute("", {
-                                        title: ibas.i18n.prop("bo_supplier_channel"),
-                                        text: "{channel}"
-                                    }),
-                                    new sap.extension.m.RepositoryObjectAttribute("", {
-                                        title: ibas.i18n.prop("bo_supplier_organizationalunit"),
-                                        text: "{organizationalunit}",
-                                        repository: initialfantasy.bo.BORepositoryInitialFantasy,
-                                        dataInfo: {
-                                            type: initialfantasy.bo.Organization,
-                                            key: initialfantasy.bo.Organization.PROPERTY_CODE_NAME,
-                                            text: initialfantasy.bo.Organization.PROPERTY_NAME_NAME
                                         },
                                     }),
                                 ]
@@ -98,7 +84,7 @@ namespace businesspartner {
                 }
                 private list: sap.extension.m.List;
                 /** 显示数据 */
-                showData(datas: bo.Supplier[]): void {
+                showData(datas: bo.BusinessPartnerGroup[]): void {
                     let model: sap.ui.model.Model = this.list.getModel();
                     if (model instanceof sap.extension.model.JSONModel) {
                         // 已绑定过数据

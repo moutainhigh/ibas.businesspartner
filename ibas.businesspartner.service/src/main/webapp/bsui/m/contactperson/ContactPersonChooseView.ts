@@ -8,10 +8,10 @@
 namespace businesspartner {
     export namespace ui {
         export namespace m {
-            export class AddressChooseView extends ibas.BOChooseView implements app.IAddressChooseView {
+            export class ContactPersonChooseView extends ibas.BOChooseView implements app.IContactPersonChooseView {
                 /** 返回查询的对象 */
                 get queryTarget(): any {
-                    return bo.Address;
+                    return bo.ContactPerson;
                 }
                 /** 绘制视图 */
                 draw(): any {
@@ -23,23 +23,23 @@ namespace businesspartner {
                         items: {
                             path: "/rows",
                             template: new sap.m.ObjectListItem("", {
-                                title: "{name} {contacts}",
+                                title: "{name} {position}",
                                 firstStatus: new sap.m.ObjectStatus("", {
                                     text: "{objectKey}"
                                 }),
                                 attributes: [
                                     new component.BusinessPartnerAttribute("", {
-                                        title: ibas.i18n.prop("bo_address_businesspartner"),
+                                        title: ibas.i18n.prop("bo_contactperson_businesspartner"),
                                         text: "{businessPartner}",
                                         typeProperty: "ownerType",
                                     }),
                                     new sap.m.ObjectAttribute("", {
-                                        title: ibas.i18n.prop("bo_address_mobilephone"),
+                                        title: ibas.i18n.prop("bo_contactperson_mobilephone"),
                                         text: "{mobilePhone}"
                                     }),
                                     new sap.m.ObjectAttribute("", {
-                                        title: ibas.i18n.prop("bo_address_street"),
-                                        text: "{street}"
+                                        title: ibas.i18n.prop("bo_contactperson_address"),
+                                        text: "{address}"
                                     }),
                                 ]
                             })
@@ -90,7 +90,7 @@ namespace businesspartner {
                 }
                 private list: sap.extension.m.List;
                 /** 显示数据 */
-                showData(datas: bo.Address[]): void {
+                showData(datas: bo.ContactPerson[]): void {
                     let model: sap.ui.model.Model = this.list.getModel();
                     if (model instanceof sap.extension.model.JSONModel) {
                         // 已绑定过数据

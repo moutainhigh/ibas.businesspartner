@@ -16,79 +16,48 @@ namespace businesspartner {
                 /** 绘制视图 */
                 draw(): any {
                     let that: this = this;
-                    this.list = new sap.m.List("", {
-                        inset: false,
-                        growing: true,
-                        growingThreshold: ibas.config.get(openui5.utils.CONFIG_ITEM_LIST_TABLE_VISIBLE_ROW_COUNT, 15),
-                        growingScrollToLoad: true,
-                        mode: sap.m.ListMode.SingleSelectLeft
-                    });
-                    let list_item_object: sap.m.ObjectListItem = new sap.m.ObjectListItem("", {
-                        title: "{name} ",
-                        type: sap.m.ListType.Active,
-                        numberUnit: "{code}",
-                        attributes: [
-                            new sap.m.ObjectAttribute("", {
-                            }).bindProperty("text", {
-                                path: "code",
-                                formatter(data: any): any {
-                                    return ibas.i18n.prop("bo_customer_code") + data;
-                                }
-                            }),
-                            new sap.m.ObjectAttribute("", {
-                            }).bindProperty("text", {
-                                path: "Telephone1",
-                                formatter(data: any): any {
-                                    return ibas.i18n.prop("bo_customer_telephone1") + data;
-                                }
-                            }),
-                        ],
-                    });
-                    this.list.bindItems({
-                        path: "/rows",
-                        template: list_item_object,
-                    });
-                    this.page = new sap.m.Page("", {
-                        showHeader: false,
-                        content: [this.list],
-                        footer: new sap.m.Toolbar("", {
-                            content: [
-                                new sap.m.Button("", {
-                                    text: ibas.i18n.prop("shell_data_new"),
-                                    visible: this.mode === ibas.emViewMode.VIEW ? false : true,
-                                    type: sap.m.ButtonType.Transparent,
-                                    // icon: "sap-icon://create",
-                                    press: function (): void {
-                                        that.fireViewEvents(that.newDataEvent);
-                                    }
-                                }),
-                                new sap.m.Button("", {
-                                    text: ibas.i18n.prop("shell_data_choose"),
-                                    type: sap.m.ButtonType.Transparent,
-                                    // icon: "sap-icon://accept",
-                                    press: function (): void {
-                                        that.fireViewEvents(that.chooseDataEvent,
-                                            // 获取表格选中的对象
-                                            openui5.utils.getSelecteds<bo.Customer>(that.list)
-                                        );
-                                    }
-                                }),
-                                new sap.m.Button("", {
-                                    text: ibas.i18n.prop("shell_exit"),
-                                    type: sap.m.ButtonType.Transparent,
-                                    // icon: "sap-icon://inspect-down",
-                                    press: function (): void {
-                                        that.fireViewEvents(that.closeEvent);
-                                    }
-                                }),
-                            ]
-                        })
-                    });
-                    this.page.setShowSubHeader(false);
-                    this.id = this.page.getId();
-                    openui5.utils.triggerNextResults({
-                        listener: this.list,
-                        next(data: any): void {
+                    this.list = new sap.extension.m.List("", {
+                        chooseType: this.chooseType,
+                        growingThreshold: sap.extension.table.visibleRowCount(15),
+                        mode: sap.m.ListMode.SingleSelectMaster,
+                        items: {
+                            path: "/rows",
+                            template: new sap.m.ObjectListItem("", {
+                                title: "{name} ({code})",
+                                attributes: [
+                                    new sap.extension.m.RepositoryObjectAttribute("", {
+                                        title: ibas.i18n.prop("bo_customer_group"),
+                                        text: "{group}",
+                                        repository: bo.BORepositoryBusinessPartner,
+                                        dataInfo: {
+                                            type: bo.BusinessPartnerGroup,
+                                            key: bo.BusinessPartnerGroup.PROPERTY_CODE_NAME,
+                                            text: bo.BusinessPartnerGroup.PROPERTY_NAME_NAME
+                                        },
+                                    }),
+                                    new sap.m.ObjectAttribute("", {
+                                        title: ibas.i18n.prop("bo_customer_channel"),
+                                        text: "{channel}"
+                                    }),
+                                    new sap.extension.m.RepositoryObjectAttribute("", {
+                                        title: ibas.i18n.prop("bo_customer_organizationalunit"),
+                                        text: "{organizationalunit}",
+                                        repository: initialfantasy.bo.BORepositoryInitialFantasy,
+                                        dataInfo: {
+                                            type: initialfantasy.bo.Organization,
+                                            key: initialfantasy.bo.Organization.PROPERTY_CODE_NAME,
+                                            text: initialfantasy.bo.Organization.PROPERTY_NAME_NAME
+                                        },
+                                    }),
+                                ]
+                            })
+                        },
+                        nextDataSet(event: sap.ui.base.Event): void {
+                            // 查询下一个数据集
+                            let data: any = event.getParameter("data");
+                            if (ibas.objects.isNull(data)) {
+                                return;
+                            }
                             if (ibas.objects.isNull(that.lastCriteria)) {
                                 return;
                             }
@@ -100,42 +69,54 @@ namespace businesspartner {
                             that.fireViewEvents(that.fetchDataEvent, criteria);
                         }
                     });
-                    return this.page;
+                    return new sap.extension.m.Dialog("", {
+                        title: this.title,
+                        type: sap.m.DialogType.Standard,
+                        state: sap.ui.core.ValueState.None,
+                        horizontalScrolling: true,
+                        verticalScrolling: true,
+                        content: [
+                            this.list
+                        ],
+                        buttons: [
+                            new sap.m.Button("", {
+                                text: ibas.i18n.prop("shell_data_choose"),
+                                type: sap.m.ButtonType.Transparent,
+                                press: function (): void {
+                                    that.fireViewEvents(that.chooseDataEvent, that.list.getSelecteds());
+                                }
+                            }),
+                            new sap.m.Button("", {
+                                text: ibas.i18n.prop("shell_exit"),
+                                type: sap.m.ButtonType.Transparent,
+                                press: function (): void {
+                                    that.fireViewEvents(that.closeEvent);
+                                }
+                            }),
+                        ]
+                    });
                 }
-                private page: sap.m.Page;
-                private form: sap.ui.layout.VerticalLayout;
-                private list: sap.m.List;
+                private list: sap.extension.m.List;
                 /** 显示数据 */
                 showData(datas: bo.Customer[]): void {
-                    let done: boolean = false;
-                    let model: sap.ui.model.Model = this.list.getModel(undefined);
-                    if (!ibas.objects.isNull(model)) {
-                        // 已存在绑定数据，添加新的
-                        let hDatas: any = (<any>model).getData();
-                        if (!ibas.objects.isNull(hDatas) && hDatas.rows instanceof Array) {
-                            for (let item of datas) {
-                                hDatas.rows.push(item);
-                            }
-                            model.refresh(false);
-                            done = true;
-                            done = true;
-                        }
-                    }
-                    if (!done) {
-                        // 没有显示数据
-                        this.list.setModel(new sap.ui.model.json.JSONModel({ rows: datas }));
+                    let model: sap.ui.model.Model = this.list.getModel();
+                    if (model instanceof sap.extension.model.JSONModel) {
+                        // 已绑定过数据
+                        model.addData(datas);
+                    } else {
+                        // 未绑定过数据
+                        this.list.setModel(new sap.extension.model.JSONModel({ rows: datas }));
                     }
                     this.list.setBusy(false);
                 }
-
                 /** 记录上次查询条件，表格滚动时自动触发 */
                 query(criteria: ibas.ICriteria): void {
                     super.query(criteria);
-
                     // 清除历史数据
-                    this.list.setBusy(true);
-                    this.list.setSelectedItemById("0", true);
-                    this.list.setModel(null);
+                    if (this.isDisplayed) {
+                        this.list.setBusy(true);
+                        this.list.setModel(null);
+                    }
                 }
             }
         }

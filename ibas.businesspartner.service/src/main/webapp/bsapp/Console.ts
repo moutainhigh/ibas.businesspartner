@@ -99,7 +99,7 @@ namespace businesspartner {
                 this.register(new ContactPersonChooseServiceMapping());
                 this.register(new CustomerChooseServiceMapping());
                 this.register(new SupplierChooseServiceMapping());
-                this.register(new BusinessPartnerAssetChooseServiceMapping());
+                this.register(new BusinessPartnerGroupChooseServiceMapping());
             }
         }
     }
